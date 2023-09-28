@@ -2,6 +2,8 @@ from tkinter import *
 from tkinter.ttk import *
 from PIL import ImageTk, Image
 from tkinter import messagebox
+from sqlite3 import *
+import home
 
 
 class LoginWindow(Tk):
@@ -31,39 +33,76 @@ class LoginWindow(Tk):
         content_frame = Frame(self, style='Content.TFrame')
         content_frame.pack(fill=BOTH, expand=True)
 
-        login_frame = Frame(content_frame, style='Content.TFrame')
-        login_frame.place(relx=.5, rely=.5, anchor=CENTER)
+        self.login_frame = Frame(content_frame, style='Content.TFrame')
+        self.login_frame.place(relx=.5, rely=.5, anchor=CENTER)
+
+        s.configure('Login.TLabel', background='white', font=('Arial', 15))
 
         img = (Image.open("Images/user1.png"))
         resized_image = img.resize((55, 50))
         content_frame.user = ImageTk.PhotoImage(resized_image)
-        login_user = Label(login_frame, image=content_frame.user, background='white', foreground='white')
+        login_user = Label(self.login_frame, image=content_frame.user, background='white', foreground='white',
+                           style='Login.TLabel')
         login_user.image = content_frame.user
-        login_user.grid(row=0, column=1)
+        login_user.grid(row=0, column=1, pady=5)
 
-        login_label = Label(login_frame, text='Login', background='white', font=('Arial', 20))
+        login_label = Label(self.login_frame, text='Login', background='white', font=('Arial', 20))
         login_label.grid(row=1, column=1)
 
         img = (Image.open("Images/user.png"))
         resized_image = img.resize((25, 25))
         content_frame.user = ImageTk.PhotoImage(resized_image)
-        username_label = Label(login_frame, image=content_frame.user, background='white', foreground='white')
-        username_label.grid(row=2, column=0)
+        username_label = Label(self.login_frame, image=content_frame.user, background='white', foreground='white')
+        username_label.grid(row=2, column=0, pady=5, padx=3)
 
-        username_entry = Entry(login_frame)
-        username_entry.grid(row=2, column=1, pady=5)
+        self.username_entry = Entry(self.login_frame, font=('Arial', 10), width=15)
+        self.username_entry.grid(row=2, column=1, pady=5)
 
         img = (Image.open("Images/lock.png"))
         resized_image = img.resize((25, 25))
         content_frame.lock = ImageTk.PhotoImage(resized_image)
-        password_label = Label(login_frame, image=content_frame.lock, background='white', foreground='white')
-        password_label.grid(row=3, column=0)
+        password_label = Label(self.login_frame, image=content_frame.lock, background='white', foreground='white',
+                               style='Login.TLabel')
+        password_label.grid(row=3, column=0, pady=5, padx=3)
 
-        password_entry = Entry(login_frame)
-        password_entry.grid(row=3, column=1, pady=5)
+        s.configure('Login.TButton', font=('Arial', 15))
 
-        login_button = Button(login_frame, text="Login")
+        self.password_entry = Entry(self.login_frame, font=('Arial', 10), width=15)
+        self.password_entry.grid(row=3, column=1, pady=5)
+
+        login_button = Button(self.login_frame, text="Login", style='Login.TButton', command=self.login_button_click)
         login_button.grid(row=4, column=1, pady=5)
+
+        # ========= show/hide password ==================================================================
+        self.show_image = ImageTk.PhotoImage(file='images/show.png')
+
+        self.hide_image = ImageTk.PhotoImage(file='images/hide.png')
+
+        show_button = Button(self.login_frame, image=self.show_image, command=self.show)
+        self.password_entry.config(show='*')
+        show_button.grid(row=3, column=2)
+
+    def show(self):
+        hide_button = Button(self.login_frame, image=self.hide_image, command=self.hide)
+        hide_button.grid(row=3, column=2)
+        self.password_entry.config(show='')
+
+    def hide(self):
+        show_button = Button(self.login_frame, image=self.show_image, command=self.show)
+        show_button.grid(row=3, column=2)
+        self.password_entry.config(show='*')
+
+    def login_button_click(self):
+        con = connect('Contacts.db')
+        cur = con.cursor()
+        cur.execute("select * from Login where Username = ? and Password = ?", (self.username_entry.get(), self.password_entry.get()))
+        row = cur.fetchone()
+        if row is not None:
+            # messagebox.showinfo("Success Message", "Logged in successfully")
+            self.destroy()
+            home.HomeWindow()
+        else:
+            messagebox.showinfo("Error Message", "Incorrect username/password")
 
 
 if __name__ == "__main__":
