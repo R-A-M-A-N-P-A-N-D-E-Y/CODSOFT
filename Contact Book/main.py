@@ -12,18 +12,18 @@ class LoginWindow(Tk):
         Tk.__init__(self, *args, **kwargs)
 
         self.title("Login")
-        self.geometry("400x300")
+        self.geometry("400x500")
 
         Icon = PhotoImage(file="Images/user.png")
         self.iconphoto(False, Icon)
 
         s = Style()
-        s.configure('Header.TFrame', background='blue')
+        s.configure('Header.TFrame', background='#935ac4')
 
         header_frame = Frame(self, style='Header.TFrame')
         header_frame.pack(fill=X)
 
-        s.configure('Header.TLabel', background='blue', foreground='white', font=('Arial', 25))
+        s.configure('Header.TLabel', background='#935ac4', foreground='white', font=('Arial', 25))
 
         header_label = Label(header_frame, text="My Contact Book", style='Header.TLabel')
         header_label.pack(pady=10)
@@ -39,15 +39,15 @@ class LoginWindow(Tk):
         s.configure('Login.TLabel', background='white', font=('Arial', 15))
 
         img = (Image.open("Images/user1.png"))
-        resized_image = img.resize((55, 50))
+        resized_image = img.resize((80, 70))
         content_frame.user = ImageTk.PhotoImage(resized_image)
         login_user = Label(self.login_frame, image=content_frame.user, background='white', foreground='white',
                            style='Login.TLabel')
         login_user.image = content_frame.user
-        login_user.grid(row=0, column=1, pady=5)
+        login_user.grid(row=0, column=1, pady=10)
 
-        login_label = Label(self.login_frame, text='Login', background='white', font=('Arial', 20))
-        login_label.grid(row=1, column=1)
+        login_label = Label(self.login_frame, text='Login', background='white', foreground="#935ac4", font=('Arial', 20))
+        login_label.grid(row=1, column=1, pady=10)
 
         img = (Image.open("Images/user.png"))
         resized_image = img.resize((25, 25))
@@ -55,7 +55,7 @@ class LoginWindow(Tk):
         username_label = Label(self.login_frame, image=content_frame.user, background='white', foreground='white')
         username_label.grid(row=2, column=0, pady=5, padx=3)
 
-        self.username_entry = Entry(self.login_frame, font=('Arial', 10), width=15)
+        self.username_entry = Entry(self.login_frame, font=('Arial', 15), width=12)
         self.username_entry.grid(row=2, column=1, pady=5)
 
         img = (Image.open("Images/lock.png"))
@@ -65,13 +65,14 @@ class LoginWindow(Tk):
                                style='Login.TLabel')
         password_label.grid(row=3, column=0, pady=5, padx=3)
 
-        s.configure('Login.TButton', font=('Arial', 15))
+        s.configure('Login.TButton', foreground='#935ac4', font=('Arial', 15))
 
-        self.password_entry = Entry(self.login_frame, font=('Arial', 10), width=15)
+        self.password_entry = Entry(self.login_frame, font=('Arial', 15), width=12)
         self.password_entry.grid(row=3, column=1, pady=5)
 
         login_button = Button(self.login_frame, text="Login", style='Login.TButton', command=self.login_button_click)
         login_button.grid(row=4, column=1, pady=5)
+        login_button.bind('<Return>')
 
         # ========= show/hide password ==================================================================
         self.show_image = ImageTk.PhotoImage(file='images/show.png')
@@ -80,7 +81,7 @@ class LoginWindow(Tk):
 
         show_button = Button(self.login_frame, image=self.show_image, command=self.show)
         self.password_entry.config(show='*')
-        show_button.grid(row=3, column=2)
+        show_button.grid(row=3, column=2, padx=5)
 
     def show(self):
         hide_button = Button(self.login_frame, image=self.hide_image, command=self.hide)
@@ -92,7 +93,7 @@ class LoginWindow(Tk):
         show_button.grid(row=3, column=2)
         self.password_entry.config(show='*')
 
-    def login_button_click(self):
+    def login_button_click(self, event = None):
         con = connect('Contacts.db')
         cur = con.cursor()
         cur.execute("select * from Login where Username = ? and Password = ?", (self.username_entry.get(), self.password_entry.get()))
@@ -102,7 +103,7 @@ class LoginWindow(Tk):
             self.destroy()
             home.HomeWindow()
         else:
-            messagebox.showinfo("Error Message", "Incorrect username/password")
+            messagebox.showerror("Error Message", "Incorrect username/password")
 
 
 if __name__ == "__main__":
